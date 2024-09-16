@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+
+    <!-- Please DO NOT remove this line, all link and script tags will be merged to here -->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/common.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fonts.css' %}" />
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/Bb.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/UntitledPage.css' %}" />
+
+  </head>
+
+  <body class="flex-column">
+
+    <main class="bb mainSection">
+      {% include 'header.html' %}
+
+      <section class="recipeSection">
+
+        <!-- Section displaying the available recipes --> 
+        <div class="flexCol">
+            {% for item in cart_items %}
+          <div class="flexRow2">
+            <img class="recipeImage1" src="{{ item.image_url }}" alt="alt text" />
+            <p class="recipeDescription">{{ item.name }}</p>
+            <div class="buttonContainer">
+                <button class="countButton">-</button>
+                <button class="countButton">+</button>
+            </div>
+            <p class="recipePrice">{{ item.quantity }} {{ item.unit }}</p>
+
+          </div>
+          <hr class="separatorLine3" size="1" />
+            {% endfor %}
+          <div class="flexCol1">
+           <p class="totalRecipeCost">Масса:            
+           {{ total_mass }} г
+           </p>
+
+            {% comment %}<button class="createRecipeButton">
+              <!-- TODO --> 
+              Создать рецепт
+            </button>{% endcomment %}
+          </div>
+        </div>
+       <div class="flexRow5">
+           <p class="recipeText">Ваш рецепт</p>
+          <div class="recipeSelectionContainer">
+            <!-- Contains elements for recipe selection -->
+            <div class="flexRow6">
+              <p class="recipeSelectionText">{{ recipe_name }}</p>
+
+            </div>
+          </div>
+          <div class="recipeImageContainer">
+            <!-- Holds the image for recipes -->
+
+          </div>
+        </div>
+      </section>
+
+      {% include 'footer.html' %}
+
+    </main>
+
+  </body>
+
+</html>

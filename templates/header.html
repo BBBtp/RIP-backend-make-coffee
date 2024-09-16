@@ -1,0 +1,17 @@
+{% load static %}
+<section class="ingredientsAndRecipesSec">
+    <!-- Section for displaying ingredients and recipe options. -->
+    <div class="flexRow">
+        <!-- Row layout for aligning content visually. -->
+        <a href="{% url 'ingridients' %}" class="flexRowTitle" style="text-decoration: none;">
+            <!-- Row layout containing title and image. -->
+            <img class="recipeImage" src="{% static 'assets/coffee_logo.svg' %}" alt="Header Image" />
+            <h1 class="recipeTitle">
+                <!-- Title of the recipe. -->
+                Чашка
+                <br />
+                Кофе
+            </h1>
+        </a>
+    </div>
+</section>

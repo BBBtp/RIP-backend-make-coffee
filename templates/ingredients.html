@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/common.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fonts.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/UntitledPage.css' %}" />
+
+</head>
+
+<body class="flex-column">
+
+    <main class=" mainSec">
+        <!-- Main section that encompasses the entire content. -->
+       {% include 'header.html' %}
+        <section class="iconSection">
+            <a href="{% url 'recipe' recipe_id=1 %}" class="contentShopImage" style="text-decoration: none">
+                <img class="search-icon" src="{% static 'assets/shopping-bag_icon.svg' %}" alt="Shopping Bag Icon" />
+                <div class="itemCount">{{ count }}</div>
+            </a>
+        </section>
+        <section class="heroSec">
+            <!-- Hero section showcasing main promotional content. -->
+            <div class="flexRowHero">
+                <!-- Row layout for hero content. -->
+                <div class="flexColHero">
+                    <!-- Column layout for hero text and image. -->
+                    <h1 class="heroTitle">
+                        <!-- Main title in the hero section. -->
+                        Каждый день мы обжариваем кофе
+                    </h1>
+                    <h2 class="heroSubtitle">
+                        <!-- Subtitle in the hero section. -->
+                        И бесплатно доставляем по всей России
+                    </h2>
+                </div>
+                <img class="heroImage" src="{% static 'assets/promo_image.png' %}" alt="Promo Image" />
+            </div>
+        </section>
+
+        <section class="productDisplaySec">
+            <!-- Section for showcasing available products. -->
+            {% comment %}<button class="showMoreBtn">
+                <!-- Button to show more products. -->
+                Показать больше
+            </button>{% endcomment %}
+            <div class="flexRowProducts">
+
+                                <form method="get" action="{% url 'ingridients' %}" class="search-form">
+                    <div class="contentBoxSearch">
+                        <label>
+                            <input
+                                class="searchHighlight"
+                                name="search"
+                                placeholder="Поиск по каталогу..."
+                                value="{{ request.GET.search }}"
+                                style="border: none; outline: none;"
+                            >
+                        </label>
+                    </div>
+                    <div class="contentBoxImage">
+                        <button type="submit" class="search-button" style="background: none; border: none; cursor: pointer;">
+                            <img class="search-icon" src="{% static 'assets/search_icon.svg' %}" alt="Search Icon" />
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="productGrid">
+                <!-- Grid layout for displaying multiple products. -->
+                {% for ingredient in ingredients %}
+                    <div class="productItem">
+                        <!-- Grid item for displaying a product. -->
+                        <a href="{% url 'ingridient_about' ingredient.id %}" class="productLink" style="text-decoration: none">
+                        <div class="flexColProduct">
+                            <!-- Column layout for product details. -->
+                            <img class="productImage" src="{{ ingredient.image_url }}" alt="{{ ingredient.name }}" />
+                            <p class="productHighlight">
+                                <!-- Highlight text for product name. -->
+                                {{ ingredient.name }}
+                            </p>
+
+                            <div class="flexRowPricing">
+                                <!-- Row layout for pricing and buy button. -->
+                                <p class="productPrice">
+                                    <!-- Price display for the product. -->
+                                    {{ ingredient.price }} ₽/ {{ ingredient.unit }}
+                                </p>
+                                <button class="buyBtn" onclick="stopPropagation()">
+                                    <!-- Buy button for the product. -->
+
+                                    <p class="buyText">
+                                        <!-- Text displayed on the buy button. -->
+                                        Добавить
+                                    </p>
+                                </button>
+                            </div>
+                        </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% include 'footer.html' %}
+
+    </main>
+
+</body>
+
+</html>

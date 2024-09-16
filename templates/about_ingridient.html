@@ -1,0 +1,64 @@
+
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+
+    <!-- Please DO NOT remove this line, all link and script tags will be merged to here -->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/common.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fonts.css' %}" />
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/About.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/UntitledPage.css' %}" />
+  </head>
+
+  <body class="flex-column">
+
+    <main class="about mainSection">
+      <!-- Main content area of the page. --> 
+      {% include 'header.html' %}
+
+      <section class="productDetailsSection">
+        <!-- Section containing details of the product. --> 
+        <div class="flexRow2">
+          <img class="productImage" src="{{ ingredient.image_url }}" alt="alt text" />
+          <div class="flexColumn">
+            <h1 class="productTitle">
+              <h1 class="title">{{ ingredient.name }}</h1>
+            </h1>
+            <div class="flexRow3">
+              <h2 class="priceTitle">{{ ingredient.price }} ₽/ {{ ingredient.unit }}</h2>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="productDescriptionSection">
+        <!-- Section providing details and descriptions of the product. --> 
+        <h1 class="descriptionTitle">Описание</h1>
+        <color class="descriptionBlock"></color>
+
+        <h2 class="mediumTitleDescription">
+            {{ ingredient.description }}
+        </h2>
+          
+      </section>
+
+     {% include 'footer.html' %}
+
+    </main>
+
+  </body>
+
+</html>
