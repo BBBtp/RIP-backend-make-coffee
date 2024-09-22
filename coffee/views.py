@@ -1,79 +1,106 @@
-from django.http import HttpResponseNotFound
-from django.shortcuts import render
-from .minio_client import get_image_url
+from itertools import count
+from venv import logger
+
+from django.db import connection
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Ingredient
+from .models import Recipe
+from .models import RecipeIngredient
 
 
+def add_ingredient_to_current_recipe(request):
+    if request.method == 'POST':
+        ingredient_id = request.POST.get('ingredient_id')
+        recipe_id = request.POST.get('recipe_id')
+        next_url = request.POST.get('next')
 
-recipes = [
-    {
-        'id': 1,
-        'name': 'Латте с белым шоколадом',
-        'ingredients': [
-            {'id': 1, 'quantity': 20, 'unit': 'г'},
-            {'id': 5, 'quantity': 10, 'unit': 'г'},
-            {'id': 6, 'quantity': 30, 'unit': 'г'}
-        ]
-    },
-    {
-        'id': 2,
-        'name': 'Раф с карамельным сиропом',
-        'ingredients': [
-            {'id': 2, 'quantity': 15, 'unit': 'г'},
-            {'id': 6, 'quantity': 5, 'unit': 'г'},
-            {'id': 4, 'quantity': 20, 'unit': 'м'},
-            {'id': 3, 'quantity': 20, 'unit': 'г'}
-        ]
-    },
-]
+        if not ingredient_id or not recipe_id:
+            print("Error: Ingredient ID or Recipe ID not provided")
+            return render(request, 'ingredients.html')
 
-ingredients = [
-    {'id': 1, 'unit': 'г', 'name': 'Эфиопия Сидамо Бири Черека', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 424/100, 'image_url': '1.png'},
-    {'id': 2, 'unit': 'г', 'name': 'Кения Гичерори', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 632/100, 'image_url': '2.png'},
-    {'id': 3, 'unit': 'г', 'name': 'Гватемала Сантьяго', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 599/100,'image_url': '3.png'},
-    {'id': 4, 'unit': 'мл', 'name': 'Сироп Gourmix Солёная карамель', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 899/100, 'image_url': '4.png'},
-    {'id': 5, 'unit': 'г', 'name': 'Шоколад белый с матчей 50 г, 37%', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 479/100, 'image_url': '5.png'},
-    {'id': 6, 'unit': 'г', 'name': 'Сухая основа для молочных напитков Лимонный тарт с меренгой', 'description': 'RAF POWDER — это сухая основа на базе кокосовых сливок, с её помощью можно приготовить разные кофейные напитки с молоком. При этом никакие другие ингредиенты не потребуются — только молоко, эспрессо и основа RAF POWDER.  Мы запустили линейку сухих основ с разными вкусами. Вкус этой основы — лимонный тарт с меренгой. Разработкой основ занимается компания OSNOVA tech, которая имеет собственную лабораторию и производство. Здесь они проводят эксперименты, тесты и слепые дегустации, чтобы создать интересный вкус. Основа легко растворяется в напитке, не оставляя комочков.  Смешивать её можно с молоком любой жирности и даже растительным — миндальным, соевым, кокосовым и любым другим. ВАЖНО: добавлять основу в отсек для молока в кофемашине нельзя, смешивайте её с молоком в отдельной ёмкости. Готовить напиток с основой можно как дома, так и в кофейнях, — это поможет сократить количество дополнительных продуктов в баре, сэкономит время на приготовление напитков, а вкус всегда будет стабильным.', 'price': 459/100, 'image_url': '6.png'}
-]
 
+        current_recipe = get_object_or_404(Recipe, pk=recipe_id)
+
+
+        if current_recipe.recipe_status != 'draft':
+            print("Error: The recipe is not in draft status")
+            return render(request, 'ingredients.html')
+
+        ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+
+
+        recipe_ingredient, created = RecipeIngredient.objects.get_or_create(
+            recipe=current_recipe, ingredient=ingredient,
+            defaults={'quantity': 1, 'unit': ingredient.unit}
+        )
+
+        if not created:
+
+            recipe_ingredient.quantity += 1
+            recipe_ingredient.save()
+
+        return redirect(next_url)
+
+def delete_recipe(request):
+    if request.method == 'POST':
+        recipe_id = request.POST.get('recipe_id')
+        user = request.user
+        if recipe_id:
+            with connection.cursor() as cursor:
+                print(f"Delete recipe {recipe_id} and {request.user.id}")
+                cursor.execute(
+                    "UPDATE public.coffee_recipe SET recipe_status = 'deleted' WHERE id = %s AND creator_id=%s AND recipe_status = 'draft'",
+                    [recipe_id,user.id]
+                )
+            return redirect('ingridients')
+    return redirect('ingridients')
 
 def ingredients_list(request):
-    query = request.GET.get('search_ingredient', '').lower()
-    filtered_ingredients = [item for item in ingredients if query in item['name'].lower()] if query else ingredients
-    count = len(recipes[0]['ingredients'])
-    recipe_id = recipes[0]['id']
-    for item in filtered_ingredients:
-        if 'image_url' not in item or not item['image_url'].startswith('http'):
-            item['image_url'] = get_image_url('coffe-recipes', item['image_url'])
+    query = request.GET.get('search_ingredient', '').strip()
+    if query:
+        filtered_ingredients = Ingredient.objects.filter(ingredient_name__icontains=query)
+    else:
+        filtered_ingredients = Ingredient.objects.all()
 
-    return render(request, 'ingredients.html', {'ingredients': filtered_ingredients,'count': count,'recipe_id': recipe_id})
+
+    current_recipe = Recipe.objects.filter(recipe_status='draft', creator=request.user).first()
+    if current_recipe:
+        count = RecipeIngredient.objects.filter(recipe_id=current_recipe.id).count()
+
+    if not current_recipe:
+        # Если заявки нет, создаем новую
+        current_recipe = Recipe.objects.create(
+            recipe_name= 'Латте с карамельным сиропом',
+            creator=request.user,
+            recipe_status='draft'
+        )
+        count = 0
+    return render(request, 'ingredients.html', {'ingredients': filtered_ingredients,'count': count,'current_recipe_id': current_recipe.id if current_recipe else None})
 
 
 def ingridient_about(request, id):
-    ingredient = next((item for item in ingredients if item['id'] == id), None)
+    ingredient = Ingredient.objects.get(id=id)
 
     return render(request, 'about_ingridient.html', {'ingredient': ingredient})
 
-def recipe(request,recipe_id):
-    # Ищем рецепт по ID
-    recipe = next((r for r in recipes if r['id'] == recipe_id), None)
-    if not recipe:
-        return HttpResponseNotFound("Recipe not found")
+def recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
 
-    # Собираем данные об ингредиентах для данного рецепта
+    # Получаем связанные ингредиенты через модель RecipeIngredient
+    recipe_ingredients = RecipeIngredient.objects.filter(recipe=recipe)
     cart_items = []
     total_mass = 0
 
-    for ingredient_item in recipe['ingredients']:
-        ingredient = next((i for i in ingredients if i['id'] == ingredient_item['id']), None)
-        if ingredient:
-            image_url = ingredient.get('image_url', '')
-            cart_items.append({
-                'name': ingredient['name'],
-                'quantity': ingredient_item['quantity'],
-                'unit': ingredient_item['unit'],
-                'price': ingredient['price'],
-                'image_url': image_url
-            })
-            total_mass += ingredient_item['quantity']
+    for item in recipe_ingredients:
+        ingredient = item.ingredient
+        image_url = ingredient.image_url.url if ingredient.image_url else ''
+        cart_items.append({
+            'name': ingredient.ingredient_name,
+            'quantity': item.quantity,
+            'unit': item.unit,
+            'price': ingredient.price,
+            'image_url': image_url
+        })
+        total_mass += item.quantity
 
-    return render(request, 'recipe.html',{'cart_items': cart_items, 'total_mass': total_mass, 'recipe_name': recipe['name']})
+    return render(request, 'recipe.html', {'cart_items': cart_items, 'total_mass': total_mass, 'recipe_name': recipe.recipe_name, 'current_recipe_id': recipe.id})

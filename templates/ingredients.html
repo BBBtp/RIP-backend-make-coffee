@@ -20,9 +20,11 @@
         <!-- Main section that encompasses the entire content. -->
        {% include 'header.html' %}
         <section class="iconSection">
-            <a href="{% url 'recipe' recipe_id=recipe_id %}" class="contentShopImage" style="text-decoration: none">
+            <a href="{% url 'recipe' recipe_id=current_recipe_id %}" class="contentShopImage" style="text-decoration: none" {% if count == 0%}disabled{% endif %}>
                 <img class="search-icon" src="{% static 'assets/shopping-bag_icon.svg' %}" alt="Shopping Bag Icon" />
-                <div class="itemCount">{{ count }}</div>
+                {% if count > 0 %}
+                <div class="itemCount" >{{ count }}</div>
+                {% endif %}
             </a>
         </section>
         <section class="heroSec">
@@ -59,7 +61,7 @@
                                 class="searchHighlight"
                                 name="search_ingredient"
                                 placeholder="Поиск по каталогу..."
-                                value="{{ request.GET.search_ingredient}}"
+                                value="{{ request.GET.search_ingredient }}"
                                 style="border: none; outline: none;"
                             >
                         </label>
@@ -81,10 +83,10 @@
                         <a href="{% url 'ingridient_about' ingredient.id %}" class="productLink" style="text-decoration: none">
                         <div class="flexColProduct">
                             <!-- Column layout for product details. -->
-                            <img class="productImage" src="{{ ingredient.image_url }}" alt="{{ ingredient.name }}" />
+                            <img class="productImage" src="{{ ingredient.image_url.url }}" alt="{{ ingredient.ingredient_name }}" />
                             <p class="productHighlight">
                                 <!-- Highlight text for product name. -->
-                                {{ ingredient.name }}
+                                {{ ingredient.ingredient_name }}
                             </p>
 
                             <div class="flexRowPricing">
@@ -93,14 +95,15 @@
                                     <!-- Price display for the product. -->
                                     {{ ingredient.price }} ₽/ {{ ingredient.unit }}
                                 </p>
-                                <button class="buyBtn" onclick="stopPropagation()">
-                                    <!-- Buy button for the product. -->
-
-                                    <p class="buyText">
-                                        <!-- Text displayed on the buy button. -->
-                                        Подробнее
-                                    </p>
+                               <form method="post" action="{% url 'add_ingredient_to_current_recipe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="ingredient_id" value="{{ ingredient.id }}">
+                                <input type="hidden" name="recipe_id" value="{{ current_recipe_id }}">
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                <button type="submit" class="buyBtn">
+                                    <p class="buyText">Добавить</p>
                                 </button>
+                            </form>
                             </div>
                         </div>
                         </a>

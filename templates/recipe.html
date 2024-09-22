@@ -44,6 +44,11 @@
           <hr class="separatorLine3" size="1" />
             {% endfor %}
           <div class="flexCol1">
+              <form method="post" action="{% url 'delete_recipe' %}">
+                  {% csrf_token %}
+              <input type="hidden" name="recipe_id" value="{{ current_recipe_id }}">
+              <button class="deleteRecipeButton">Удалить заявку</button>
+              </form>
            <p class="totalRecipeCost">Масса:            
            {{ total_mass }} г
            </p>

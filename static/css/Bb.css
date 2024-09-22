@@ -344,11 +344,12 @@
 }
 .bb .flexCol1 {
   display: flex;
-  flex-direction: column;
-  gap: 21px 0;
+  flex-direction: row;
+  column-gap: 30px;
   margin: 22px 0 0 auto;
-  width: 286px;
+  width: 400px;
   max-width: 85%;
+  align-items: center;
 }
 .bb .totalRecipeCost {
   font: 700 16px/1.25 Montserrat, Helvetica, Arial, serif;
@@ -554,4 +555,18 @@
   width: 48px;
   -o-object-fit: cover;
   object-fit: cover;
+}
+
+.bb .deleteRecipeButton{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0 17px;
+  min-width: 174px;
+  background-color: #573821;
+  border-radius: 23px;
+  padding: 13px 28px;
+  color: white;
+  font: 700 14px/1.25 Montserrat, Helvetica, Arial, serif;
+  cursor: pointer;
 }

@@ -19,8 +19,10 @@ from django.urls import path
 from coffee import views
 
 urlpatterns = [
-
+    path('admin/', admin.site.urls),
     path('', views.ingredients_list, name='ingridients'),
     path('ingridient_about/<int:id>/', views.ingridient_about, name='ingridient_about'),
-    path('recipe/<int:recipe_id>/', views.recipe, name='recipe')
+    path('recipe/<int:recipe_id>/', views.recipe, name='recipe'),
+    path('add-ingredient/', views.add_ingredient_to_current_recipe, name='add_ingredient_to_current_recipe'),
+    path('delete_recipe/', views.delete_recipe, name='delete_recipe'),
 ]

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'coffee',
 ]
 
 MIDDLEWARE = [
@@ -72,14 +73,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'WEB-backend-make-coffee.wsgi.application'
 
+MEDIA_URL = 'http://localhost:9000/make-coffee/'
 
+
+DEFAULT_FILE_STORAGE = 'minio_storage.storage.MinioMediaStorage'
+
+MINIO_STORAGE_ENDPOINT = 'localhost:9000'  # Ваш MinIO endpoint
+MINIO_STORAGE_ACCESS_KEY = 'minio'
+MINIO_STORAGE_SECRET_KEY = 'minio124'
+MINIO_STORAGE_USE_HTTPS = False  # Включить HTTPS, если MinIO настроен на HTTPS
+MINIO_STORAGE_MEDIA_BUCKET_NAME = 'make-coffee'  # Название бакета для медиафайлов
+
+MEDIA_ROOT = ''
+STATIC_ROOT = ''
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'making-coffee',
+        'USER': 'postgres',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -106,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
