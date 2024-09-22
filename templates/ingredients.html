@@ -20,7 +20,7 @@
         <!-- Main section that encompasses the entire content. -->
        {% include 'header.html' %}
         <section class="iconSection">
-            <a href="{% url 'recipe' recipe_id=1 %}" class="contentShopImage" style="text-decoration: none">
+            <a href="{% url 'recipe' recipe_id=recipe_id %}" class="contentShopImage" style="text-decoration: none">
                 <img class="search-icon" src="{% static 'assets/shopping-bag_icon.svg' %}" alt="Shopping Bag Icon" />
                 <div class="itemCount">{{ count }}</div>
             </a>
@@ -57,9 +57,9 @@
                         <label>
                             <input
                                 class="searchHighlight"
-                                name="search"
+                                name="search_ingredient"
                                 placeholder="Поиск по каталогу..."
-                                value="{{ request.GET.search }}"
+                                value="{{ request.GET.search_ingredient}}"
                                 style="border: none; outline: none;"
                             >
                         </label>
@@ -98,7 +98,7 @@
 
                                     <p class="buyText">
                                         <!-- Text displayed on the buy button. -->
-                                        Добавить
+                                        Подробнее
                                     </p>
                                 </button>
                             </div>

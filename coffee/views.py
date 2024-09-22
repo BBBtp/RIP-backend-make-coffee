@@ -37,15 +37,15 @@ ingredients = [
 
 
 def ingredients_list(request):
-    query = request.GET.get('search', '').lower()
+    query = request.GET.get('search_ingredient', '').lower()
     filtered_ingredients = [item for item in ingredients if query in item['name'].lower()] if query else ingredients
     count = len(recipes[0]['ingredients'])
-
+    recipe_id = recipes[0]['id']
     for item in filtered_ingredients:
         if 'image_url' not in item or not item['image_url'].startswith('http'):
             item['image_url'] = get_image_url('coffe-recipes', item['image_url'])
 
-    return render(request, 'ingredients.html', {'ingredients': filtered_ingredients,'count': count})
+    return render(request, 'ingredients.html', {'ingredients': filtered_ingredients,'count': count,'recipe_id': recipe_id})
 
 
 def ingridient_about(request, id):
