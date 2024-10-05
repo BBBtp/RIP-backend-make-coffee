@@ -10,7 +10,7 @@ minio_client = Minio(
 )
 
 # Проверяем, существует ли бакет
-bucket_name = "make-coffee"
+bucket_name = "coffe-recipes"
 found = minio_client.bucket_exists(bucket_name)
 if not found:
     minio_client.make_bucket(bucket_name)

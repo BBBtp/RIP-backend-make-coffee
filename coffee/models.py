@@ -1,24 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import User
-from minio_storage.storage import MinioStorage
 from coffee.minio_client import minio_client, bucket_name
 
 class Ingredient(models.Model):
-    ms = MinioStorage(minio_client=minio_client, bucket_name=bucket_name)
+    STATUS_CHOICES = [
+        ('active', 'Действует'),
+        ('deleted', 'Удален'),
+    ]
     ingredient_name = models.CharField(max_length=255, verbose_name="Название")
     description = models.CharField(max_length=5000, verbose_name="Описание")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
     unit = models.CharField(max_length=10, verbose_name="Единица измерения")
-    image_url = models.ImageField(storage=ms,verbose_name="Изображение")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active', verbose_name="Статус")
+    image_filename = models.CharField(max_length=255,
+                                      verbose_name="Имя файла изображения в Minio",default="default.png")
+    image_url = models.URLField(verbose_name="Ссылка на изображение", max_length=1000, blank=True)
 
     class Meta:
         verbose_name = "Ингредиент"
         verbose_name_plural = 'Ингредиенты'
 
-
-
     def __str__(self):
         return self.ingredient_name
+
+    def save(self, *args, **kwargs):
+
+        if self.image_filename:
+            self.image_url = f"http://localhost:9000/{bucket_name}/{self.image_filename}"
+
+        super().save(*args, **kwargs)
 
 class Recipe(models.Model):
     STATUS_CHOICES = [
@@ -65,12 +75,3 @@ class RecipeIngredient(models.Model):
     def __str__(self):
         return f"{self.quantity} {self.unit} {self.ingredient.ingredient_name} для {self.recipe.recipe_name}"
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-
-    class Meta:
-        verbose_name_plural = 'Пользователи'
-        verbose_name = 'Пользователь'
-
-    def __str__(self):
-        return f"{self.user.username}"

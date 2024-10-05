@@ -20,10 +20,13 @@
         <!-- Main section that encompasses the entire content. -->
        {% include 'header.html' %}
         <section class="iconSection">
-            <a href="{% url 'recipe' recipe_id=current_recipe_id %}" class="contentShopImage" style="text-decoration: none" {% if count == 0%}disabled{% endif %}>
+            <a 
+                href="{% if current_recipe_id %}{% url 'recipe' recipe_id=current_recipe_id %}{% else %}#{% endif %}" 
+                class="contentShopImage {% if not current_recipe_id %}disabled{% endif %}" 
+                style="text-decoration: none; pointer-events: {% if not current_recipe_id %}none{% endif %}; opacity: {% if not current_recipe_id %}0.8{% endif %};">
                 <img class="search-icon" src="{% static 'assets/shopping-bag_icon.svg' %}" alt="Shopping Bag Icon" />
                 {% if count > 0 %}
-                <div class="itemCount" >{{ count }}</div>
+                    <div class="itemCount">{{ count }}</div>
                 {% endif %}
             </a>
         </section>
@@ -83,7 +86,7 @@
                         <a href="{% url 'ingridient_about' ingredient.id %}" class="productLink" style="text-decoration: none">
                         <div class="flexColProduct">
                             <!-- Column layout for product details. -->
-                            <img class="productImage" src="{{ ingredient.image_url.url }}" alt="{{ ingredient.ingredient_name }}" />
+                            <img class="productImage" src="{{ ingredient.image_url }}" alt="{{ ingredient.ingredient_name }}" />
                             <p class="productHighlight">
                                 <!-- Highlight text for product name. -->
                                 {{ ingredient.ingredient_name }}
