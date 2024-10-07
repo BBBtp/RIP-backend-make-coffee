@@ -54,6 +54,11 @@ class Recipe(models.Model):
     def __str__(self):
         return f'Рецепт: {self.recipe_name}, статус: {self.get_recipe_status_display()}'
 
+    @property
+    def total_cost(self):
+        total = sum(ingredient.quantity * ingredient.ingredient.price for ingredient in self.ingredients.all())
+        return total
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='ingredients', on_delete=models.CASCADE, verbose_name="Рецепт")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Ингредиент")
