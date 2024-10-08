@@ -1,10 +1,9 @@
-from django.contrib.auth import authenticate
+
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.authtoken.views import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
