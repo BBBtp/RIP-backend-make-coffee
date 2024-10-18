@@ -11,6 +11,15 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = '__all__'
 
+class DraftRecipeSerializer(serializers.ModelSerializer):
+    ingredient_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'ingredient_count']  # Указываем только нужные поля
+
+    def get_ingredient_count(self, obj):
+        return RecipeIngredient.objects.filter(recipe=obj).count()
 
 class RecipeSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='creator.username', read_only=True)
