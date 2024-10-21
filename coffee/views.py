@@ -146,7 +146,7 @@ class RecipeList(APIView):
         status_filter = request.query_params.get('status')
 
         if status_filter:
-            recipes = recipes.filter(status=status_filter)
+            recipes = recipes.filter(recipe_status=status_filter)
 
         if start_date and end_date:
             recipes = recipes.filter(created_at__range=[start_date, end_date])

@@ -10,7 +10,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # URL для работы с ингредиентами
     path('ingredients/', IngredientList.as_view(), name='ingredient_list'),  # GET, POST
-    path('ingredients/<int:pk>/', IngredientDetail.as_view(), name='ingredient_detail'),  # GET, PUT, DELETE
+    path('ingredients/<int:pk>/', IngredientDetail.as_view(), name='ingredient_detail'),  # GET, PUT, DELETE, POST
     path('ingredients/<int:pk>/draft-recipe/', IngredientDraftRecipe.as_view(), name='ingredient_draft_recipe'),
     # POST для создания черновика
 

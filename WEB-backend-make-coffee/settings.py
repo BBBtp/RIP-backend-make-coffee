@@ -86,12 +86,11 @@ MEDIA_URL = 'http://localhost:9000/make-coffee/'
 
 DEFAULT_FILE_STORAGE = 'minio_storage.storage.MinioMediaStorage'
 
-MINIO_STORAGE_ENDPOINT = 'localhost:9000'  # Ваш MinIO endpoint
-MINIO_STORAGE_ACCESS_KEY = 'minio'
-MINIO_STORAGE_SECRET_KEY = 'minio124'
-MINIO_STORAGE_USE_HTTPS = False  # Включить HTTPS, если MinIO настроен на HTTPS
-MINIO_STORAGE_MEDIA_BUCKET_NAME = 'make-coffee'  # Название бакета для медиафайлов
-
+AWS_STORAGE_BUCKET_NAME = 'make-coffee'
+AWS_ACCESS_KEY_ID = 'minio'
+AWS_SECRET_ACCESS_KEY = 'minio124'
+AWS_S3_ENDPOINT_URL = 'localhost:9000'
+MINIO_USE_SSL = False
 MEDIA_ROOT = ''
 STATIC_ROOT = ''
 # Database
