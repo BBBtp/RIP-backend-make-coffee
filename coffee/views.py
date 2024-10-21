@@ -7,7 +7,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from coffee.serializers import IngredientSerializer, RecipeSerializer, RecipeIngredientSerializer, UserSerializer
+from coffee.serializers import IngredientSerializer, RecipeSerializer, RecipeIngredientSerializer, UserSerializer, \
+    DraftRecipeSerializer
 from .minio import add_pic, delete_pic
 from .models import Ingredient, Recipe, RecipeIngredient
 from .singletons import CreatorSingleton
@@ -15,7 +16,7 @@ from .singletons import CreatorSingleton
 
 class IngredientList(APIView):
     ingredient_serializer_class = IngredientSerializer
-    recipe_serializer_class = RecipeSerializer
+    recipe_serializer_class = DraftRecipeSerializer
     creator = CreatorSingleton.get_creator()
 
     # Возвращает список ингредиентов и черновика рецепта
