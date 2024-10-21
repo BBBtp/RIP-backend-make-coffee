@@ -17,7 +17,6 @@ from django.conf.global_settings import STATICFILES_DIRS
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-^ci1dq(e=5^#rl#hv!lt^y+!@y51@iq$j4!+eopzv5%=$=(%r_
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -41,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'coffee',
     'rest_framework',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.BasicAuthentication',
+                                       'rest_framework.authentication.SessionAuthentication', ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+
     ],
 }
 
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'coffee.middleware.GuestAccessMiddleware'
 ]
 
 ROOT_URLCONF = 'WEB-backend-make-coffee.urls'
@@ -82,8 +84,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'WEB-backend-make-coffee.wsgi.application'
 
 MEDIA_URL = 'http://localhost:9000/make-coffee/'
-
-
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
 DEFAULT_FILE_STORAGE = 'minio_storage.storage.MinioMediaStorage'
 
 AWS_STORAGE_BUCKET_NAME = 'make-coffee'
@@ -107,7 +109,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -125,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

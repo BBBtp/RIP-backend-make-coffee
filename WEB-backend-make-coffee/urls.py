@@ -1,16 +1,32 @@
 from django.contrib import admin
 from coffee.views import *
-from rest_framework import routers
+from rest_framework import routers, permissions
 from django.urls import include, path
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 router = routers.DefaultRouter()
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Snippets API",
+        default_version='v1',
+        description="Test description",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # URL для работы с ингредиентами
     path('ingredients/', IngredientList.as_view(), name='ingredient_list'),  # GET, POST
-    path('ingredients/<int:pk>/', IngredientDetail.as_view(), name='ingredient_detail'),  # GET, PUT, DELETE, POST
+    path('ingredients/<int:pk>/', IngredientDetail.as_view(), name='ingredient_detail'),  # GET, PUT, DELETE
     path('ingredients/<int:pk>/draft-recipe/', IngredientDraftRecipe.as_view(), name='ingredient_draft_recipe'),
     # POST для создания черновика
 
