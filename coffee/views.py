@@ -52,16 +52,18 @@ class IngredientList(APIView):
             ingredients = ingredients.filter(
                 ingredient_name__icontains=name_filter)
         ingredient_data = self.ingredient_serializer_class(ingredients, many=True)
-        draft_recipe_data = None
-        if isinstance(request.user, IsCreator):  # Проверка на создателя
+
+        if not request.user.is_authenticated:
+            draft_recipe = None
+        else:
             draft_recipe = Recipe.objects.filter(recipe_status="draft", creator=request.user).first()
-            draft_recipe_data = self.recipe_serializer_class(draft_recipe).data if draft_recipe else None
+        draft_recipe_data = self.recipe_serializer_class(draft_recipe).data if draft_recipe else None
         if name_filter:
             return Response({
                 'ingredients': ingredient_data.data,
             })
         else:
-            print(request.user)
+
             return Response({
                 'ingredients': ingredient_data.data,
                 'draft_recipe': draft_recipe_data,
@@ -156,7 +158,7 @@ class IngredientDraftRecipe(APIView):
             message = "Ингредиент добавлен в существующий черновик"
         else:
             draft_recipe = Recipe.objects.create(
-                creator=self.creator,
+                creator=request.user,
                 recipe_status='draft',
                 recipe_name='Латте с карамельным сиропом',
             )
@@ -180,7 +182,11 @@ class RecipeList(APIView):
     @swagger_auto_schema(method='get')
     @method_permission_classes((IsCreator,))
     def get(self, request, format=None):
-        recipes = Recipe.objects.exclude(recipe_status__in=['deleted', 'draft']).filter(creator=request.user)
+        if request.user.is_staff or request.user.is_superuser:
+            recipes = Recipe.objects.all()
+        else:
+            recipes = Recipe.objects.exclude(recipe_status__in=['draft','deleted']).filter(creator=request.user)
+
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
         status_filter = request.query_params.get('status')
@@ -313,7 +319,7 @@ class RecipeIngredientDetail(APIView):
 class UserRegistration(APIView):
     serializer_class = UserSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []
 
     # Регистрация пользователя
     @swagger_auto_schema(request_body=UserSerializer)
@@ -346,12 +352,13 @@ class UserUpdate(APIView):
     # Изменение данных пользователя
     @swagger_auto_schema(request_body=UserSerializer)
     @method_permission_classes((IsAdmin,))
-    def put(self, request, format=None):
-        user = request.user
+    def put(self, request, id,format=None):
+        user = get_object_or_404(User, id=id)
         serializer = self.serializer_class(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserWork(APIView):
@@ -372,7 +379,7 @@ class UserWork(APIView):
 class UserAuthentication(APIView):
     serializer_class = UserSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []
 
     # Аутентификация пользователя
     @swagger_auto_schema(request_body=UserSerializer)
@@ -402,7 +409,7 @@ class UserAuthentication(APIView):
 class UserLogout(APIView):
     serializer_class = UserSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = []
 
     # Деавторизация пользователя
     @swagger_auto_schema(request_body=UserSerializer)

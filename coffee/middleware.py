@@ -12,9 +12,9 @@ class GuestAccessMiddleware(MiddlewareMixin):
 
 
         if session_id:
-            user_id = session_storage.get(session_id)
+            user_id = session_storage.get(session_id).decode('UTF-8')
             if user_id:
-                request.user = User.objects.get(id=user_id)
+                request.user = User.objects.get(username=user_id)
             else:
                 request.user = AnonymousUser()
         else:

@@ -41,7 +41,7 @@ urlpatterns = [
 
     # URL для работы с пользователями
     path('users/register/', UserRegistration.as_view(), name='user_registration'),  # POST
-    path('users/update/', UserUpdate.as_view(), name='user_update'),  # PUT
+    path('users/<int:pk>/update/', UserUpdate.as_view(), name='user_update'),  # PUT
     path('users/login/', UserAuthentication.as_view(), name='user_login'),  # POST
     path('users/logout/', UserLogout.as_view(), name='user_logout'),  # POST
 ]

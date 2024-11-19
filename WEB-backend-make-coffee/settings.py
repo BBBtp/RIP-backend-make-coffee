@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'coffee',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -52,6 +53,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +63,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'coffee.middleware.GuestAccessMiddleware'
 ]
-
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React-приложение
+]
 ROOT_URLCONF = 'WEB-backend-make-coffee.urls'
 
 TEMPLATES = [
